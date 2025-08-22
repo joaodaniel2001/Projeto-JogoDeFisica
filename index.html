@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<title>Simulador 2ª Lei de Newton</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
+  #cenario {
+    width: 600px;
+    height: 100px;
+    border: 2px solid #333;
+    position: relative;
+    margin-top: 20px;
+  }
+  #objeto {
+    width: 40px;
+    height: 40px;
+    background-color: #007bff;
+    position: absolute;
+    left: 0;
+    top: 30px;
+    border-radius: 5px;
+  }
+  input {
+    width: 80px;
+    margin-right: 10px;
+  }
+</style>
+</head>
+<body>
+
+<h2>Simulador da 2ª Lei de Newton</h2>
+
+<label>Força (N): <input type="number" id="forca" value="10" step="0.1"></label>
+<label>Massa (kg): <input type="number" id="massa" value="2" step="0.1"></label>
+<button id="startBtn">Aplicar Força</button>
+
+<div id="cenario">
+  <div id="objeto"></div>
+</div>
+
+<script>
+  const objeto = document.getElementById('objeto');
+  const forcaInput = document.getElementById('forca');
+  const massaInput = document.getElementById('massa');
+  const startBtn = document.getElementById('startBtn');
+
+  let pos = 0;      // posição em px
+  let vel = 0;      // velocidade em px/s
+  let acel = 0;     // aceleração em px/s²
+  let lastTime = null;
+  let animando = false;
+
+  function animar(time) {
+    if (!lastTime) lastTime = time;
+    const deltaTime = (time - lastTime) / 1000; // em segundos
+    lastTime = time;
+
+    vel += acel * deltaTime;      // v = v0 + a*t
+    pos += vel * deltaTime;       // s = s0 + v*t
+
+    if (pos < 0) {  // limitar posição para não sair do cenário
+      pos = 0;
+      vel = 0;
+    } else if (pos > 560) {  // 600 - largura do objeto(40)
+      pos = 560;
+      vel = 0;
+    }
+
+    objeto.style.left = pos + 'px';
+
+    if (animando) {
+      requestAnimationFrame(animar);
+    }
+  }
+
+  startBtn.onclick = () => {
+    const F = parseFloat(forcaInput.value);
+    const m = parseFloat(massaInput.value);
+
+    if (m <= 0) {
+      alert("Massa deve ser maior que zero!");
+      return;
+    }
+
+    acel = F / m;  // a = F/m
+
+    pos = 0;
+    vel = 0;
+    objeto.style.left = pos + 'px';
+
+    animando = true;
+    lastTime = null;
+    requestAnimationFrame(animar);
+  };
+</script>
+
+</body>
+</html>
